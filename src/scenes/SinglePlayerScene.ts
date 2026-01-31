@@ -10,11 +10,29 @@ import GameStateManager from '../state/GameStateManager.js';
 import EventBus from '../state/EventBus.js';
 
 export default class SinglePlayerScene extends Phaser.Scene {
+  private board!: Board;
+  private scoreManager!: ScoreManager;
+  private timer!: Timer;
+  private visualEffects!: VisualEffects;
+  private soundManager!: SoundManager;
+
+  private scoreText!: Phaser.GameObjects.Text;
+  private highScoreText!: Phaser.GameObjects.Text;
+  private comboText!: Phaser.GameObjects.Text;
+  private timerText!: Phaser.GameObjects.Text;
+  private timerBarBg!: Phaser.GameObjects.Rectangle;
+  private timerBar!: Phaser.GameObjects.Rectangle;
+  private matchesText!: Phaser.GameObjects.Text;
+  private gameOverContainer!: Phaser.GameObjects.Container;
+  private gameOverTitle!: Phaser.GameObjects.Text;
+  private finalScoreText!: Phaser.GameObjects.Text;
+  private newHighScoreText!: Phaser.GameObjects.Text;
+
   constructor() {
     super({ key: SCENES.SINGLE_PLAYER });
   }
 
-  create() {
+  create(): void {
     // Initialize game state
     GameStateManager.resetGameState();
     GameStateManager.set('currentScene', SCENES.SINGLE_PLAYER);
@@ -43,7 +61,7 @@ export default class SinglePlayerScene extends Phaser.Scene {
     this.startGame();
   }
 
-  setupUI() {
+  setupUI(): void {
     const width = this.cameras.main.width;
 
     // Title
@@ -163,23 +181,23 @@ export default class SinglePlayerScene extends Phaser.Scene {
     ]);
   }
 
-  setupInput() {
+  setupInput(): void {
     // Handle pointer down on tiles
-    this.input.on('gameobjectdown', (pointer, gameObject) => {
-      if (gameObject.tileRef && !this.board.isProcessing && !GameStateManager.get('isGameOver')) {
+    this.input.on('gameobjectdown', (pointer: Phaser.Input.Pointer, gameObject: any) => {
+      if (gameObject.tileRef && !GameStateManager.get('isGameOver')) {
         this.soundManager.play('select');
         this.board.selectTile(gameObject.tileRef);
       }
     });
   }
 
-  setupTimer() {
-    this.timer.onTick((remainingTime) => {
+  setupTimer(): void {
+    this.timer.onTick((remainingTime: number) => {
       this.updateTimerDisplay(remainingTime);
       GameStateManager.set('timeRemaining', remainingTime);
     });
 
-    this.timer.onWarning((remainingTime) => {
+    this.timer.onWarning((remainingTime: number) => {
       // Flash timer when running low
       this.tweens.add({
         targets: this.timerText,
@@ -196,9 +214,9 @@ export default class SinglePlayerScene extends Phaser.Scene {
     });
   }
 
-  setupVisualEffects() {
+  setupVisualEffects(): void {
     // Listen for tile match events
-    EventBus.on('tiles:matched', (tiles, comboCount) => {
+    EventBus.on('tiles:matched', (tiles: any, comboCount: number) => {
       // Create match visual effects
       this.visualEffects.createMatchEffect(tiles);
 
@@ -224,12 +242,12 @@ export default class SinglePlayerScene extends Phaser.Scene {
     }, this);
   }
 
-  startGame() {
+  startGame(): void {
     this.timer.start();
     this.updateUI();
   }
 
-  updateUI() {
+  updateUI(): void {
     this.scoreText.setText(`SCORE: ${this.scoreManager.getFormattedScore()}`);
     this.highScoreText.setText(`HIGH: ${this.scoreManager.getHighScore().toString().padStart(6, '0')}`);
 
@@ -246,7 +264,7 @@ export default class SinglePlayerScene extends Phaser.Scene {
     });
   }
 
-  updateTimerDisplay(remainingTime) {
+  updateTimerDisplay(remainingTime: number): void {
     this.timerText.setText(`TIME: ${this.timer.getFormattedTime()}`);
 
     // Update timer bar
@@ -263,7 +281,7 @@ export default class SinglePlayerScene extends Phaser.Scene {
     }
   }
 
-  async processBoardMatches() {
+  async processBoardMatches(): Promise<void> {
     const result = await this.board.processMatches(this.board.findMatches());
 
     if (result.matches.length > 0) {
@@ -275,12 +293,12 @@ export default class SinglePlayerScene extends Phaser.Scene {
     }
   }
 
-  showScorePopup(points, combos) {
+  showScorePopup(points: number, combos: number): void {
     const width = this.cameras.main.width;
     this.visualEffects.createFloatingScore(width / 2, 300, points, combos > 1);
   }
 
-  gameOver() {
+  gameOver(): void {
     GameStateManager.set('isGameOver', true);
     this.timer.stop();
 
@@ -302,7 +320,7 @@ export default class SinglePlayerScene extends Phaser.Scene {
     this.gameOverContainer.setVisible(true);
   }
 
-  endGame() {
+  endGame(): void {
     if (this.timer) {
       this.timer.destroy();
     }
@@ -314,11 +332,11 @@ export default class SinglePlayerScene extends Phaser.Scene {
     }
   }
 
-  update() {
+  update(): void {
     // Handle any continuous updates here if needed
   }
 
-  shutdown() {
+  shutdown(): void {
     this.endGame();
   }
 }

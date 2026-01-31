@@ -2,12 +2,17 @@ import Phaser from 'phaser';
 import { SCENES, TILE_COLORS } from '../utils/constants.js';
 import GameStateManager from '../state/GameStateManager.js';
 
+interface Button {
+  button: Phaser.GameObjects.Rectangle;
+  text: Phaser.GameObjects.Text;
+}
+
 export default class MenuScene extends Phaser.Scene {
   constructor() {
     super({ key: SCENES.MENU });
   }
 
-  create() {
+  create(): void {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
@@ -86,7 +91,16 @@ export default class MenuScene extends Phaser.Scene {
     this.cameras.main.fadeIn(500);
   }
 
-  createButton(x, y, width, height, text, color, onClick, disabled = false) {
+  createButton(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    text: string,
+    color: number,
+    onClick: () => void,
+    disabled: boolean = false
+  ): Button {
     const button = this.add.rectangle(x, y, width, height, color);
     button.setStrokeStyle(2, 0xffffff, disabled ? 0.3 : 0.6);
 
@@ -138,7 +152,7 @@ export default class MenuScene extends Phaser.Scene {
     return { button, text: buttonText };
   }
 
-  createBackgroundParticles() {
+  createBackgroundParticles(): void {
     // Create floating gem particles in background
     for (let i = 0; i < 8; i++) {
       const x = Phaser.Math.Between(50, 750);
@@ -161,7 +175,7 @@ export default class MenuScene extends Phaser.Scene {
     }
   }
 
-  showSettings() {
+  showSettings(): void {
     // Create settings overlay
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;

@@ -3,13 +3,26 @@ import { BOARD_CONFIG, TILE_COLORS } from '../utils/constants.js';
 import { gridToPixel } from '../utils/helpers.js';
 
 export default class Tile {
-  constructor(scene, row, col, type) {
+  scene: Phaser.Scene;
+  row: number;
+  col: number;
+  type: number;
+  isMatched: boolean;
+  isMoving: boolean;
+  container: Phaser.GameObjects.Container;
+  sprite: Phaser.GameObjects.Image;
+  private glowCircle: Phaser.GameObjects.Arc | null;
+  private highlightTween: Phaser.Tweens.Tween | null;
+
+  constructor(scene: Phaser.Scene, row: number, col: number, type: number) {
     this.scene = scene;
     this.row = row;
     this.col = col;
     this.type = type;
     this.isMatched = false;
     this.isMoving = false;
+    this.glowCircle = null;
+    this.highlightTween = null;
 
     // Create the visual representation
     const pos = gridToPixel(row, col, BOARD_CONFIG.TILE_SIZE, BOARD_CONFIG.OFFSET_X, BOARD_CONFIG.OFFSET_Y);
@@ -52,8 +65,8 @@ export default class Tile {
     this.container.add(this.sprite);
 
     // Store reference to this tile in the sprite for easy access
-    this.sprite.tileRef = this;
-    this.container.tileRef = this;
+    (this.sprite as any).tileRef = this;
+    (this.container as any).tileRef = this;
 
     // Add entrance animation
     this.container.setScale(0);
@@ -68,7 +81,7 @@ export default class Tile {
   /**
    * Update the tile's position on the board
    */
-  setPosition(row, col) {
+  setPosition(row: number, col: number): void {
     this.row = row;
     this.col = col;
   }
@@ -76,7 +89,7 @@ export default class Tile {
   /**
    * Animate tile movement to a new grid position
    */
-  moveTo(row, col, duration = 300) {
+  moveTo(row: number, col: number, duration: number = 300): Promise<void> {
     return new Promise((resolve) => {
       this.isMoving = true;
       this.setPosition(row, col);
@@ -100,7 +113,7 @@ export default class Tile {
   /**
    * Animate tile swap with another tile
    */
-  swapWith(otherTile, duration = 200) {
+  swapWith(otherTile: Tile, duration: number = 200): Promise<void> {
     return new Promise((resolve) => {
       this.isMoving = true;
       otherTile.isMoving = true;
@@ -141,7 +154,7 @@ export default class Tile {
   /**
    * Mark the tile as matched and play removal animation
    */
-  match() {
+  match(): Promise<void> {
     return new Promise((resolve) => {
       this.isMatched = true;
 
@@ -171,7 +184,7 @@ export default class Tile {
   /**
    * Highlight the tile (selected state)
    */
-  highlight() {
+  highlight(): void {
     // Add glow effect
     if (!this.glowCircle) {
       this.glowCircle = this.scene.add.circle(0, 0, BOARD_CONFIG.TILE_SIZE * 0.5, 0xffff00, 0.5);
@@ -191,7 +204,7 @@ export default class Tile {
   /**
    * Remove highlight
    */
-  unhighlight() {
+  unhighlight(): void {
     // Remove glow effect
     if (this.glowCircle) {
       this.glowCircle.destroy();
@@ -215,11 +228,9 @@ export default class Tile {
   /**
    * Destroy the tile and clean up
    */
-  destroy() {
+  destroy(): void {
     if (this.container) {
       this.container.destroy();
-      this.container = null;
     }
-    this.sprite = null;
   }
 }

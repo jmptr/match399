@@ -1,7 +1,17 @@
 /**
  * Simple event bus for game-wide communication
  */
+
+type EventCallback = (...args: any[]) => void;
+
+interface EventSubscription {
+  callback: EventCallback;
+  context: any;
+}
+
 class EventBus {
+  private events: Record<string, EventSubscription[]>;
+
   constructor() {
     this.events = {};
   }
@@ -9,7 +19,7 @@ class EventBus {
   /**
    * Subscribe to an event
    */
-  on(eventName, callback, context = null) {
+  on(eventName: string, callback: EventCallback, context: any = null): void {
     if (!this.events[eventName]) {
       this.events[eventName] = [];
     }
@@ -20,7 +30,7 @@ class EventBus {
   /**
    * Unsubscribe from an event
    */
-  off(eventName, callback) {
+  off(eventName: string, callback: EventCallback): void {
     if (!this.events[eventName]) return;
 
     this.events[eventName] = this.events[eventName].filter(
@@ -31,7 +41,7 @@ class EventBus {
   /**
    * Emit an event
    */
-  emit(eventName, ...args) {
+  emit(eventName: string, ...args: any[]): void {
     if (!this.events[eventName]) return;
 
     this.events[eventName].forEach((event) => {
@@ -46,8 +56,8 @@ class EventBus {
   /**
    * Subscribe to an event once
    */
-  once(eventName, callback, context = null) {
-    const onceCallback = (...args) => {
+  once(eventName: string, callback: EventCallback, context: any = null): void {
+    const onceCallback = (...args: any[]) => {
       callback.apply(context, args);
       this.off(eventName, onceCallback);
     };
@@ -58,7 +68,7 @@ class EventBus {
   /**
    * Clear all event listeners for an event
    */
-  clear(eventName) {
+  clear(eventName?: string): void {
     if (eventName) {
       delete this.events[eventName];
     } else {

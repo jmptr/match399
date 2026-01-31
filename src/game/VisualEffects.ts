@@ -1,16 +1,24 @@
 import Phaser from 'phaser';
 import { TILE_COLORS } from '../utils/constants.js';
 
+// Forward declaration for Tile type (will be properly imported once Tile.ts exists)
+interface TileInterface {
+  container: Phaser.GameObjects.Container;
+  type: number;
+}
+
 export default class VisualEffects {
-  constructor(scene) {
+  private scene: Phaser.Scene;
+
+  constructor(scene: Phaser.Scene) {
     this.scene = scene;
   }
 
   /**
    * Create particle explosion effect at position
    */
-  createExplosion(x, y, color, count = 10) {
-    const particles = [];
+  createExplosion(x: number, y: number, color: number, count: number = 10): Phaser.GameObjects.Arc[] {
+    const particles: Phaser.GameObjects.Arc[] = [];
 
     for (let i = 0; i < count; i++) {
       const angle = (Math.PI * 2 * i) / count;
@@ -42,7 +50,7 @@ export default class VisualEffects {
   /**
    * Create match effect with particles
    */
-  createMatchEffect(tiles) {
+  createMatchEffect(tiles: TileInterface[]): void {
     tiles.forEach((tile) => {
       const x = tile.container.x;
       const y = tile.container.y;
@@ -69,7 +77,7 @@ export default class VisualEffects {
   /**
    * Create combo text effect
    */
-  createComboText(comboCount) {
+  createComboText(comboCount: number): void {
     const width = this.scene.cameras.main.width;
     const height = this.scene.cameras.main.height;
 
@@ -109,21 +117,21 @@ export default class VisualEffects {
   /**
    * Screen shake effect
    */
-  screenShake(intensity = 0.005, duration = 100) {
+  screenShake(intensity: number = 0.005, duration: number = 100): void {
     this.scene.cameras.main.shake(duration, intensity);
   }
 
   /**
    * Flash the screen
    */
-  screenFlash(color = 0xffffff, alpha = 0.3, duration = 100) {
+  screenFlash(color: number = 0xffffff, alpha: number = 0.3, duration: number = 100): void {
     this.scene.cameras.main.flash(duration, color >> 16, (color >> 8) & 0xff, color & 0xff, false, alpha);
   }
 
   /**
    * Create glow effect on tile
    */
-  createGlow(sprite, color, intensity = 2) {
+  createGlow(sprite: Phaser.GameObjects.Arc, color: number, intensity: number = 2): Phaser.GameObjects.Arc {
     const glow = this.scene.add.circle(sprite.x, sprite.y, sprite.radius * 1.5, color, 0.3);
     glow.setDepth(sprite.depth - 1);
 
@@ -142,7 +150,7 @@ export default class VisualEffects {
   /**
    * Create floating score text
    */
-  createFloatingScore(x, y, points, isCombo = false) {
+  createFloatingScore(x: number, y: number, points: number, isCombo: boolean = false): void {
     const text = this.scene.add.text(x, y, `+${points}`, {
       font: `bold ${isCombo ? 36 : 28}px monospace`,
       fill: isCombo ? '#ffff00' : '#ffffff',
@@ -166,7 +174,7 @@ export default class VisualEffects {
   /**
    * Create trail effect
    */
-  createTrail(fromX, fromY, toX, toY, color) {
+  createTrail(fromX: number, fromY: number, toX: number, toY: number, color: number): void {
     const trail = this.scene.add.graphics();
     trail.lineStyle(4, color, 0.6);
     trail.lineBetween(fromX, fromY, toX, toY);
@@ -184,7 +192,7 @@ export default class VisualEffects {
   /**
    * Create ripple effect
    */
-  createRipple(x, y, color) {
+  createRipple(x: number, y: number, color: number): void {
     const ripple = this.scene.add.circle(x, y, 10, color, 0.5);
 
     this.scene.tweens.add({
@@ -202,7 +210,7 @@ export default class VisualEffects {
   /**
    * Create success effect (for level complete, etc.)
    */
-  createSuccessEffect() {
+  createSuccessEffect(): void {
     const width = this.scene.cameras.main.width;
     const height = this.scene.cameras.main.height;
 
@@ -224,7 +232,7 @@ export default class VisualEffects {
   /**
    * Create time warning pulse effect
    */
-  createTimeWarningPulse(target) {
+  createTimeWarningPulse(target: any): Phaser.Tweens.Tween {
     return this.scene.tweens.add({
       targets: target,
       scale: { from: 1, to: 1.1 },
@@ -237,7 +245,7 @@ export default class VisualEffects {
   /**
    * Destroy all active effects
    */
-  destroy() {
+  destroy(): void {
     // Effects are automatically cleaned up by their tweens
   }
 }

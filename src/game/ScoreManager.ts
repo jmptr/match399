@@ -1,6 +1,11 @@
 import { SCORE_CONFIG } from '../utils/constants.js';
 
 export default class ScoreManager {
+  private score: number;
+  private comboMultiplier: number;
+  private totalMatches: number;
+  private highScore: number;
+
   constructor() {
     this.score = 0;
     this.comboMultiplier = 1.0;
@@ -11,7 +16,7 @@ export default class ScoreManager {
   /**
    * Calculate and add points for matched tiles
    */
-  addScore(matchedTiles, comboCount = 1) {
+  addScore(matchedTiles: any[], comboCount: number = 1): number {
     if (!matchedTiles || matchedTiles.length === 0) return 0;
 
     // Base score depends on number of tiles matched
@@ -44,35 +49,35 @@ export default class ScoreManager {
   /**
    * Reset combo multiplier (called when no matches found)
    */
-  resetCombo() {
+  resetCombo(): void {
     this.comboMultiplier = 1.0;
   }
 
   /**
    * Get current score
    */
-  getScore() {
+  getScore(): number {
     return this.score;
   }
 
   /**
    * Get current combo multiplier
    */
-  getComboMultiplier() {
+  getComboMultiplier(): number {
     return this.comboMultiplier;
   }
 
   /**
    * Get total matches made
    */
-  getTotalMatches() {
+  getTotalMatches(): number {
     return this.totalMatches;
   }
 
   /**
    * Get high score from local storage
    */
-  loadHighScore() {
+  loadHighScore(): number {
     try {
       const saved = localStorage.getItem('match3-highscore');
       return saved ? parseInt(saved, 10) : 0;
@@ -84,7 +89,7 @@ export default class ScoreManager {
   /**
    * Save high score to local storage
    */
-  saveHighScore() {
+  saveHighScore(): void {
     if (this.score > this.highScore) {
       this.highScore = this.score;
       try {
@@ -98,21 +103,21 @@ export default class ScoreManager {
   /**
    * Get high score
    */
-  getHighScore() {
+  getHighScore(): number {
     return this.highScore;
   }
 
   /**
    * Check if current score is a new high score
    */
-  isNewHighScore() {
+  isNewHighScore(): boolean {
     return this.score > this.highScore;
   }
 
   /**
    * Reset the score for a new game
    */
-  reset() {
+  reset(): void {
     this.score = 0;
     this.comboMultiplier = 1.0;
     this.totalMatches = 0;
@@ -121,14 +126,14 @@ export default class ScoreManager {
   /**
    * Get formatted score display
    */
-  getFormattedScore() {
+  getFormattedScore(): string {
     return this.score.toString().padStart(6, '0');
   }
 
   /**
    * Get formatted combo display
    */
-  getFormattedCombo() {
+  getFormattedCombo(): string {
     if (this.comboMultiplier <= 1.0) return '';
     return `x${this.comboMultiplier.toFixed(1)}`;
   }

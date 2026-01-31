@@ -1,7 +1,22 @@
+import Phaser from 'phaser';
 import { formatTime } from '../utils/helpers.js';
 
+interface TimerCallbacks {
+  onTick: ((remainingTime: number) => void) | null;
+  onComplete: (() => void) | null;
+  onWarning: ((remainingTime: number) => void) | null;
+}
+
 export default class Timer {
-  constructor(scene, duration) {
+  private scene: Phaser.Scene;
+  private duration: number;
+  private remainingTime: number;
+  private isRunning: boolean;
+  private isPaused: boolean;
+  private timerEvent: Phaser.Time.TimerEvent | null;
+  private callbacks: TimerCallbacks;
+
+  constructor(scene: Phaser.Scene, duration: number) {
     this.scene = scene;
     this.duration = duration; // in seconds
     this.remainingTime = duration;
@@ -18,7 +33,7 @@ export default class Timer {
   /**
    * Start the timer
    */
-  start() {
+  start(): void {
     if (this.isRunning) return;
 
     this.isRunning = true;
@@ -35,7 +50,7 @@ export default class Timer {
   /**
    * Pause the timer
    */
-  pause() {
+  pause(): void {
     if (!this.isRunning || this.isPaused) return;
     this.isPaused = true;
     if (this.timerEvent) {
@@ -46,7 +61,7 @@ export default class Timer {
   /**
    * Resume the timer
    */
-  resume() {
+  resume(): void {
     if (!this.isRunning || !this.isPaused) return;
     this.isPaused = false;
     if (this.timerEvent) {
@@ -57,7 +72,7 @@ export default class Timer {
   /**
    * Stop the timer
    */
-  stop() {
+  stop(): void {
     this.isRunning = false;
     this.isPaused = false;
     if (this.timerEvent) {
@@ -69,7 +84,7 @@ export default class Timer {
   /**
    * Reset the timer
    */
-  reset(newDuration = null) {
+  reset(newDuration: number | null = null): void {
     this.stop();
     if (newDuration !== null) {
       this.duration = newDuration;
@@ -80,7 +95,7 @@ export default class Timer {
   /**
    * Timer tick callback
    */
-  tick() {
+  private tick(): void {
     if (this.isPaused) return;
 
     this.remainingTime--;
@@ -107,7 +122,7 @@ export default class Timer {
   /**
    * Add time to the timer
    */
-  addTime(seconds) {
+  addTime(seconds: number): void {
     this.remainingTime += seconds;
     if (this.remainingTime > this.duration) {
       this.remainingTime = this.duration;
@@ -117,7 +132,7 @@ export default class Timer {
   /**
    * Subtract time from the timer
    */
-  subtractTime(seconds) {
+  subtractTime(seconds: number): void {
     this.remainingTime -= seconds;
     if (this.remainingTime < 0) {
       this.remainingTime = 0;
@@ -131,64 +146,68 @@ export default class Timer {
   /**
    * Get remaining time in seconds
    */
-  getRemainingTime() {
+  getRemainingTime(): number {
     return this.remainingTime;
   }
 
   /**
    * Get formatted time string (MM:SS)
    */
-  getFormattedTime() {
+  getFormattedTime(): string {
     return formatTime(this.remainingTime);
   }
 
   /**
    * Get percentage of time remaining
    */
-  getPercentageRemaining() {
+  getPercentageRemaining(): number {
     return (this.remainingTime / this.duration) * 100;
   }
 
   /**
    * Check if timer is running low (less than 30 seconds)
    */
-  isRunningLow() {
+  isRunningLow(): boolean {
     return this.remainingTime <= 30;
   }
 
   /**
    * Check if timer is almost done (less than 10 seconds)
    */
-  isAlmostDone() {
+  isAlmostDone(): boolean {
     return this.remainingTime <= 10;
   }
 
   /**
    * Set callback for timer tick
    */
-  onTick(callback) {
+  onTick(callback: (remainingTime: number) => void): void {
     this.callbacks.onTick = callback;
   }
 
   /**
    * Set callback for timer completion
    */
-  onComplete(callback) {
+  onComplete(callback: () => void): void {
     this.callbacks.onComplete = callback;
   }
 
   /**
    * Set callback for timer warning
    */
-  onWarning(callback) {
+  onWarning(callback: (remainingTime: number) => void): void {
     this.callbacks.onWarning = callback;
   }
 
   /**
    * Clean up
    */
-  destroy() {
+  destroy(): void {
     this.stop();
-    this.callbacks = {};
+    this.callbacks = {
+      onTick: null,
+      onComplete: null,
+      onWarning: null,
+    };
   }
 }

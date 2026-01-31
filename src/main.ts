@@ -1,10 +1,10 @@
 import Phaser from 'phaser';
-import { GAME_CONFIG, SCENES } from './utils/constants.js';
+import { GAME_CONFIG } from './utils/constants.js';
 import BootScene from './scenes/BootScene.js';
 import MenuScene from './scenes/MenuScene.js';
 import SinglePlayerScene from './scenes/SinglePlayerScene.js';
 
-const config = {
+const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   width: GAME_CONFIG.WIDTH,
   height: GAME_CONFIG.HEIGHT,
@@ -23,4 +23,10 @@ const config = {
 const game = new Phaser.Game(config);
 
 // Make game instance available globally for debugging
+declare global {
+  interface Window {
+    game: Phaser.Game;
+  }
+}
+
 window.game = game;

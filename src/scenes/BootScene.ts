@@ -6,7 +6,7 @@ export default class BootScene extends Phaser.Scene {
     super({ key: SCENES.BOOT });
   }
 
-  preload() {
+  preload(): void {
     // Create a loading bar
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
@@ -29,8 +29,8 @@ export default class BootScene extends Phaser.Scene {
     percentText.setOrigin(0.5, 0.5);
 
     // Update progress bar
-    this.load.on('progress', (value) => {
-      percentText.setText(parseInt(value * 100) + '%');
+    this.load.on('progress', (value: number) => {
+      percentText.setText(parseInt((value * 100).toString()) + '%');
       progressBar.clear();
       progressBar.fillStyle(0xffffff, 1);
       progressBar.fillRect(width / 2 - 150, height / 2 - 15, 300 * value, 30);
@@ -47,7 +47,7 @@ export default class BootScene extends Phaser.Scene {
     // In Phase 2, we'll load actual sprites and audio
   }
 
-  create() {
+  create(): void {
     // Move to menu scene
     this.scene.start(SCENES.MENU);
   }

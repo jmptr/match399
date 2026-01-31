@@ -1,7 +1,14 @@
+import Phaser from 'phaser';
 import GameStateManager from '../state/GameStateManager.js';
 
+type OscillatorType = 'sine' | 'square' | 'sawtooth' | 'triangle';
+
 export default class SoundManager {
-  constructor(scene) {
+  private scene: Phaser.Scene;
+  private sounds: Record<string, any>;
+  private music: Phaser.Sound.BaseSound | null;
+
+  constructor(scene: Phaser.Scene) {
     this.scene = scene;
     this.sounds = {};
     this.music = null;
@@ -13,7 +20,7 @@ export default class SoundManager {
   /**
    * Create basic synthesized sound effects
    */
-  createSounds() {
+  createSounds(): void {
     // We'll use Phaser's sound system which will be ready for real audio files
     // For now, we'll create placeholder sounds that can be easily replaced
 
@@ -24,7 +31,7 @@ export default class SoundManager {
   /**
    * Play a sound effect
    */
-  play(soundName, config = {}) {
+  play(soundName: string, config: any = {}): void {
     if (!GameStateManager.getSetting('soundEnabled')) return;
 
     const volume = GameStateManager.getSetting('soundVolume') || 0.7;
@@ -61,7 +68,7 @@ export default class SoundManager {
   /**
    * Play a simple tone using Web Audio API
    */
-  playTone(frequency, duration, type = 'sine', volume = 0.5) {
+  playTone(frequency: number, duration: number, type: OscillatorType = 'sine', volume: number = 0.5): void {
     if (!this.scene.sound.context) return;
 
     const audioContext = this.scene.sound.context;
@@ -84,7 +91,7 @@ export default class SoundManager {
   /**
    * Play a chord (multiple tones)
    */
-  playChord(frequencies, duration, volume = 0.5) {
+  playChord(frequencies: number[], duration: number, volume: number = 0.5): void {
     frequencies.forEach((freq, index) => {
       setTimeout(() => {
         this.playTone(freq, duration * 0.8, 'sine', volume / frequencies.length);
@@ -95,7 +102,7 @@ export default class SoundManager {
   /**
    * Play background music
    */
-  playMusic(musicName, loop = true) {
+  playMusic(musicName: string, loop: boolean = true): void {
     if (!GameStateManager.getSetting('musicEnabled')) return;
 
     // Placeholder for music playback
@@ -106,7 +113,7 @@ export default class SoundManager {
   /**
    * Stop background music
    */
-  stopMusic() {
+  stopMusic(): void {
     if (this.music) {
       this.music.stop();
       this.music = null;
@@ -116,14 +123,14 @@ export default class SoundManager {
   /**
    * Set sound volume
    */
-  setSoundVolume(volume) {
+  setSoundVolume(volume: number): void {
     GameStateManager.setSetting('soundVolume', volume);
   }
 
   /**
    * Set music volume
    */
-  setMusicVolume(volume) {
+  setMusicVolume(volume: number): void {
     GameStateManager.setSetting('musicVolume', volume);
     if (this.music) {
       this.music.setVolume(volume);
@@ -133,7 +140,7 @@ export default class SoundManager {
   /**
    * Toggle sound on/off
    */
-  toggleSound() {
+  toggleSound(): boolean {
     const enabled = !GameStateManager.getSetting('soundEnabled');
     GameStateManager.setSetting('soundEnabled', enabled);
     return enabled;
@@ -142,7 +149,7 @@ export default class SoundManager {
   /**
    * Toggle music on/off
    */
-  toggleMusic() {
+  toggleMusic(): boolean {
     const enabled = !GameStateManager.getSetting('musicEnabled');
     GameStateManager.setSetting('musicEnabled', enabled);
 
@@ -158,7 +165,7 @@ export default class SoundManager {
   /**
    * Clean up
    */
-  destroy() {
+  destroy(): void {
     this.stopMusic();
     this.sounds = {};
   }

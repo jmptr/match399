@@ -1,10 +1,23 @@
+import Phaser from 'phaser';
 import Tile from './Tile.js';
 import { BOARD_CONFIG } from '../utils/constants.js';
 import { randomInt, isValidGridPosition, areAdjacent } from '../utils/helpers.js';
 import EventBus from '../state/EventBus.js';
 
+interface ProcessMatchesResult {
+  matches: Tile[];
+  combos: number;
+}
+
 export default class Board {
-  constructor(scene) {
+  private scene: Phaser.Scene;
+  private rows: number;
+  private cols: number;
+  private grid: (Tile | null)[][];
+  private selectedTile: Tile | null;
+  private isProcessing: boolean;
+
+  constructor(scene: Phaser.Scene) {
     this.scene = scene;
     this.rows = BOARD_CONFIG.ROWS;
     this.cols = BOARD_CONFIG.COLS;
@@ -18,7 +31,7 @@ export default class Board {
   /**
    * Initialize the board with tiles
    */
-  initialize() {
+  initialize(): void {
     // Create empty grid
     this.grid = Array(this.rows)
       .fill(null)
@@ -27,7 +40,7 @@ export default class Board {
     // Fill with random tiles, ensuring no initial matches
     for (let row = 0; row < this.rows; row++) {
       for (let col = 0; col < this.cols; col++) {
-        let type;
+        let type: number;
         let attempts = 0;
         const maxAttempts = 10;
 
@@ -47,15 +60,15 @@ export default class Board {
   /**
    * Check if placing a tile type at position would create a match
    */
-  wouldCreateMatch(row, col, type) {
+  wouldCreateMatch(row: number, col: number, type: number): boolean {
     // Check horizontal
     let horizontalCount = 1;
     // Check left
-    for (let c = col - 1; c >= 0 && this.grid[row][c] && this.grid[row][c].type === type; c--) {
+    for (let c = col - 1; c >= 0 && this.grid[row][c] && this.grid[row][c]!.type === type; c--) {
       horizontalCount++;
     }
     // Check right
-    for (let c = col + 1; c < this.cols && this.grid[row][c] && this.grid[row][c].type === type; c++) {
+    for (let c = col + 1; c < this.cols && this.grid[row][c] && this.grid[row][c]!.type === type; c++) {
       horizontalCount++;
     }
 
@@ -64,11 +77,11 @@ export default class Board {
     // Check vertical
     let verticalCount = 1;
     // Check up
-    for (let r = row - 1; r >= 0 && this.grid[r][col] && this.grid[r][col].type === type; r--) {
+    for (let r = row - 1; r >= 0 && this.grid[r][col] && this.grid[r][col]!.type === type; r--) {
       verticalCount++;
     }
     // Check down
-    for (let r = row + 1; r < this.rows && this.grid[r][col] && this.grid[r][col].type === type; r++) {
+    for (let r = row + 1; r < this.rows && this.grid[r][col] && this.grid[r][col]!.type === type; r++) {
       verticalCount++;
     }
 
@@ -80,7 +93,7 @@ export default class Board {
   /**
    * Get tile at grid position
    */
-  getTile(row, col) {
+  getTile(row: number, col: number): Tile | null {
     if (!isValidGridPosition(row, col, this.rows, this.cols)) return null;
     return this.grid[row][col];
   }
@@ -88,7 +101,7 @@ export default class Board {
   /**
    * Handle tile selection
    */
-  selectTile(tile) {
+  selectTile(tile: Tile): void {
     if (this.isProcessing || !tile) return;
 
     // If no tile is selected, select this one
@@ -124,7 +137,7 @@ export default class Board {
   /**
    * Swap two tiles
    */
-  async swapTiles(tile1, tile2) {
+  async swapTiles(tile1: Tile, tile2: Tile): Promise<void> {
     this.isProcessing = true;
 
     // Update grid references
@@ -159,8 +172,8 @@ export default class Board {
   /**
    * Find all matches on the board
    */
-  findMatches() {
-    const matches = new Set();
+  findMatches(): Tile[] {
+    const matches = new Set<Tile>();
 
     // Check horizontal matches
     for (let row = 0; row < this.rows; row++) {
@@ -180,7 +193,7 @@ export default class Board {
 
         if (matchLength >= 3) {
           for (let c = col; c < col + matchLength; c++) {
-            matches.add(this.grid[row][c]);
+            matches.add(this.grid[row][c]!);
           }
         }
       }
@@ -204,7 +217,7 @@ export default class Board {
 
         if (matchLength >= 3) {
           for (let r = row; r < row + matchLength; r++) {
-            matches.add(this.grid[r][col]);
+            matches.add(this.grid[r][col]!);
           }
         }
       }
@@ -216,7 +229,7 @@ export default class Board {
   /**
    * Process matched tiles and trigger cascades
    */
-  async processMatches(matches) {
+  async processMatches(matches: Tile[]): Promise<ProcessMatchesResult> {
     if (matches.length === 0) return { matches: [], combos: 0 };
 
     let totalMatches = [...matches];
@@ -259,8 +272,8 @@ export default class Board {
   /**
    * Apply gravity to make tiles fall
    */
-  async applyGravity() {
-    const promises = [];
+  async applyGravity(): Promise<void> {
+    const promises: Promise<void>[] = [];
 
     for (let col = 0; col < this.cols; col++) {
       // Process each column from bottom to top
@@ -285,8 +298,8 @@ export default class Board {
   /**
    * Fill empty spaces with new tiles
    */
-  async fillBoard() {
-    const promises = [];
+  async fillBoard(): Promise<void> {
+    const promises: Promise<void>[] = [];
 
     for (let col = 0; col < this.cols; col++) {
       let emptyCount = 0;
@@ -314,11 +327,11 @@ export default class Board {
   /**
    * Clean up the board
    */
-  destroy() {
+  destroy(): void {
     for (let row = 0; row < this.rows; row++) {
       for (let col = 0; col < this.cols; col++) {
         if (this.grid[row][col]) {
-          this.grid[row][col].destroy();
+          this.grid[row][col]!.destroy();
         }
       }
     }
