@@ -23,7 +23,7 @@ export default class SinglePlayerScene extends Phaser.Scene {
     // Create game systems
     this.board = new Board(this);
     this.scoreManager = new ScoreManager();
-    this.timer = new Timer(this, TIMER_CONFIG.SINGLE_PLAYER_TIME);
+    this.timer = new Timer(this, TIMER_CONFIG.GAME_TIME);
     this.visualEffects = new VisualEffects(this);
     this.soundManager = new SoundManager(this);
 

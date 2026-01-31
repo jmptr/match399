@@ -40,15 +40,11 @@ export const SCORE_CONFIG = {
 };
 
 export const TIMER_CONFIG = {
-  SINGLE_PLAYER_TIME: 120, // 2 minutes in seconds
-  MULTIPLAYER_TIME: 180, // 3 minutes in seconds
+  GAME_TIME: 120, // 2 minutes in seconds
 };
 
 export const SCENES = {
   BOOT: 'BootScene',
   MENU: 'MenuScene',
   SINGLE_PLAYER: 'SinglePlayerScene',
-  LOGIN: 'LoginScene',
-  MULTIPLAYER_LOBBY: 'MultiplayerLobbyScene',
-  MULTIPLAYER: 'MultiplayerScene',
 };

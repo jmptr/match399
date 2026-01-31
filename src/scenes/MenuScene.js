@@ -40,13 +40,13 @@ export default class MenuScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     });
 
-    // Single Player Button
-    const singlePlayerBtn = this.createButton(
+    // Play Button
+    const playBtn = this.createButton(
       width / 2,
-      height / 2 - 50,
+      height / 2,
       300,
       60,
-      'Single Player',
+      'Play',
       0x4CAF50,
       () => {
         this.cameras.main.fadeOut(300);
@@ -56,32 +56,10 @@ export default class MenuScene extends Phaser.Scene {
       }
     );
 
-    // Multiplayer Button
-    const multiplayerBtn = this.createButton(
-      width / 2,
-      height / 2 + 50,
-      300,
-      60,
-      'Multiplayer',
-      0xFF9800,
-      () => {
-        this.cameras.main.fadeOut(300);
-        this.time.delayedCall(300, () => {
-          this.scene.start(SCENES.LOGIN);
-        });
-      }
-    );
-
-    const multiplayerNote = this.add.text(width / 2, height / 2 + 85, '(Requires Supabase setup)', {
-      font: '12px monospace',
-      fill: '#999999',
-    });
-    multiplayerNote.setOrigin(0.5);
-
     // Settings button
     const settingsBtn = this.createButton(
       width / 2,
-      height / 2 + 150,
+      height / 2 + 100,
       300,
       60,
       'Settings',

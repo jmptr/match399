@@ -7,7 +7,7 @@ class GameStateManager {
   constructor() {
     this.state = {
       currentScene: null,
-      gameMode: null, // 'singleplayer' or 'multiplayer'
+      gameMode: 'singleplayer',
       score: 0,
       highScore: 0,
       timeRemaining: 0,

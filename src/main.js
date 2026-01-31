@@ -3,9 +3,6 @@ import { GAME_CONFIG, SCENES } from './utils/constants.js';
 import BootScene from './scenes/BootScene.js';
 import MenuScene from './scenes/MenuScene.js';
 import SinglePlayerScene from './scenes/SinglePlayerScene.js';
-import LoginScene from './scenes/LoginScene.js';
-import MultiplayerLobbyScene from './scenes/MultiplayerLobbyScene.js';
-import MultiplayerScene from './scenes/MultiplayerScene.js';
 
 const config = {
   type: Phaser.AUTO,
@@ -13,7 +10,7 @@ const config = {
   height: GAME_CONFIG.HEIGHT,
   parent: 'game-container',
   backgroundColor: GAME_CONFIG.BACKGROUND_COLOR,
-  scene: [BootScene, MenuScene, SinglePlayerScene, LoginScene, MultiplayerLobbyScene, MultiplayerScene],
+  scene: [BootScene, MenuScene, SinglePlayerScene],
   physics: {
     default: 'arcade',
     arcade: {
